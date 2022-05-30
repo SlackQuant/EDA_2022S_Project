@@ -1402,7 +1402,7 @@ renderTable({
 
 ```
 
-# **1. OECD CLI Strategy**
+# **[TAA] OECD CLI Strategy**
 
 ## Row
 
@@ -1634,4 +1634,93 @@ renderTable({
 
 })
     
+```
+
+# **[Research] Quantitative Research**
+
+## Row
+
+### **[AllocateSmartly](https://allocatesmartly.com/blog/)**
+
+```{r}
+
+## allocatesmartly
+
+URL <- "https://allocatesmartly.com/blog/"
+res <- read_html(URL)
+
+# Case 2. Element
+pattern <- ".entry-title-link"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+pattern <- ".entry-content p"
+Content <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+# Case 3. Attribute
+pattern <- ".entry-title-link"
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href")
+
+tbl <- cbind(title, link, Content) %>% 
+  as_tibble()
+
+df <- tbl %>%
+  mutate(Title = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(Title, Content)
+df %>% head(10) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+  column_spec(1, width = "6em") %>%
+  column_spec(2, width = "35em")
+
+```
+
+## Row
+
+### **[AQR](https://www.aqr.com/Insights/Research)**
+
+```{r}
+
+## aqr
+
+URL <- "https://www.aqr.com/Insights/Research"
+res <- read_html(URL)
+
+# Case 2. Element
+pattern <- ".cta--black"
+title2 <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+pattern <- ".article__date"
+Date <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() %>% 
+  str_trim()
+
+# Case 3. Attribute
+pattern <- ".cta--black"
+link2 <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href") %>% 
+  str_c("https://www.aqr.com", .)
+
+tbl2 <- cbind(title2, Date, link2) %>% 
+  as_tibble()
+
+df2 <- tbl2 %>%
+  mutate(Title = cell_spec(title2, "html", link = link2, color="#062872")) %>%
+  select(Date, Title)
+df2 %>% head(10) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+  column_spec(1, width = "6em") %>%
+  column_spec(2, width = "35em")
+  # column_spec(3, width = "6em")
+
 ```
