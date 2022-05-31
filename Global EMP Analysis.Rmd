@@ -1633,7 +1633,15 @@ renderTable({
   strategy_rtns_yr
 
 })
-    
+
+# 추가예정
+# **[TAA] Adaptive Asset Allocation**
+
+## Row
+
+# **[TAA] TAA with ML**
+
+## Row    
 ```
 
 # **[Research] Quantitative Research**
