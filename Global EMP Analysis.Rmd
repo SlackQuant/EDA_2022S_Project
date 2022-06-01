@@ -1132,7 +1132,7 @@ renderPlot({
 
 # **Portfolio Optimization**
 
-## Row {data-height="750"}
+## Row {data-height="850"}
 
 ### **Portfolio Construction**
 
@@ -1164,7 +1164,7 @@ actionButton("go2", "Optimize")
 
 fluidRow(
   column(3,
-         numericInput("n_simul", "# of Random Portfolios", 5000)),
+         numericInput("n_simul", "# of Random Portfolios", 10000)),
 )
 
 ```
