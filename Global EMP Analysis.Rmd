@@ -35,7 +35,7 @@ library(RiskPortfolios)
 # Sidebar {.sidebar data-width="480"}
 
 ### **Portfolio Construction**
-- 웹 브라우저 글꼴 크기 8~90%
+- 웹 브라우저 글꼴 크기 80~90% 설정
 
 - 시작일보다 늦게 상장된 ETF가 존재하는 경우,
 
