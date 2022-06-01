@@ -1459,6 +1459,14 @@ renderValueBox({
 
 ### **Portfolio Allocation Rules**
 
+#### **<실행>**
+
+```{r}
+
+actionButton("go3", "Download & Simulate")   
+
+```
+
 #### **<확인사항>**
 
 - **_사이드바 업데이트시 현재 페이지 활성화되어 있으면 작동 안함!_**
@@ -1477,14 +1485,12 @@ renderValueBox({
  - **<[Yahoo Finance](https://finance.yahoo.com/)>**
  
  - **<[OECD](https://data.oecd.org/leadind/composite-leading-indicator-cli.htm)>**
-
-#### **<실행>**
-
-```{r}
-
-actionButton("go3", "Download & Simulate")   
-
-```
+ 
+ - **<[Using OECD Composite Leading Indicator Data to Time the Market](https://allocatesmartly.com/using-oecd-composite-leading-indicator-data-to-time-the-market/)>**
+ 
+ - **<[Global Growth Cycle](https://grzegorz.link/growth)>**
+ 
+ - **<[How good are early esimates of OECD Composite Leading Indicators?](https://www.oecd.org/sdd/leading-indicators/40182804.pdf)>**
 
 ### **Cumulative Performance : Korea**
 
