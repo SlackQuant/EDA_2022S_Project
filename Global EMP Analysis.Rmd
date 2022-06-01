@@ -1679,7 +1679,7 @@ tbl2 <- cbind(title2, Date, link2) %>%
 df2 <- tbl2 %>%
   mutate(Title = cell_spec(title2, "html", link = link2, color="#062872")) %>%
   select(Date, Title)
-df2 %>% head(10) %>%
+df2 %>% head(20) %>%
   kable(format="html", escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
   # column_spec(1, width = "6em") %>%
@@ -1718,7 +1718,7 @@ tbl <- cbind(title, link, Content) %>%
 df <- tbl %>%
   mutate(Title = cell_spec(title, "html", link = link, color="#062872")) %>%
   select(Title, Content)
-df %>% head(10) %>%
+df %>% head(20) %>%
   kable(format="html", escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
   # column_spec(1, width = "6em") %>%
@@ -1772,7 +1772,52 @@ tbl3 <- cbind(Title, Date, Author, Content, link3) %>%
 df3 <- tbl3 %>%
   mutate(Title = cell_spec(Title, "html", link = link3, color="#062872")) %>%
   select(Date, Title, Author, Content)
-df3 %>% head(10) %>%
+df3 %>% head(20) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+  # column_spec(1, width = "6em") %>%
+  # column_spec(2, width = "35em") %>% 
+  # column_spec(3, width = "6em")
+
+```
+
+### **<[Quantocracy](https://quantocracy.com/)>**
+
+```{r}
+
+## Quantocracy
+
+URL <- "https://quantocracy.com/"
+res <- read_html(URL)
+
+
+# Case 2. Element
+pattern <- "#qo-mashup > div > div.qo-content-col > a"
+Title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() %>% 
+  str_trim()
+
+pattern <- "#qo-mashup > div > div.qo-content-col > div.qo-extras > div > em > span"
+Date <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() %>% 
+  str_trim() %>% 
+  str_remove(., ", ")
+
+# Case 3. Attribute
+pattern <- "#qo-mashup > div > div.qo-content-col > a"
+link4 <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href")
+
+tbl4 <- cbind(Title, Date) %>% 
+  as_tibble()
+
+df4 <- tbl4 %>%
+  mutate(Title = cell_spec(Title, "html", link = link4, color="#062872")) %>%
+  select(Date, Title)
+df4 %>% head(30) %>%
   kable(format="html", escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
   # column_spec(1, width = "6em") %>%
