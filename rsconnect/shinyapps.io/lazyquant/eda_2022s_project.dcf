@@ -5,7 +5,7 @@ account: lazyquant
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 6407486
-bundleId: 5965893
+bundleId: 5966030
 url: https://lazyquant.shinyapps.io/eda_2022s_project/
-when: 1654047463.81938
-lastSyncTime: 1654047463.81938
+when: 1654051305.08545
+lastSyncTime: 1654051305.08546
