@@ -5,7 +5,17 @@ output:
   flexdashboard::flex_dashboard:
     orientation: rows
     # source_code: embed
+    # vertical_layout: scroll
+    theme: 
+      version: 4
+      bootswatch: minty
 ---
+
+<style type="text/css">
+  body{
+  font-size: 10pt;
+}
+</style>
 
 ```{r setup, message = FALSE}
 
@@ -34,8 +44,8 @@ library(RiskPortfolios)
 
 # Sidebar {.sidebar data-width="480"}
 
-### **Portfolio Construction**
-- 웹 브라우저 글꼴 크기 80~90% 설정
+##### **Portfolio Construction**
+- PC-Only, 웹 브라우저 글꼴 크기 80~90% 설정
 
 - 시작일보다 늦게 상장된 ETF가 존재하는 경우,
 
@@ -132,7 +142,7 @@ fluidRow(
                        "Quarterly" = "quarters",
                        "Monthly" = "months",
                        "Weekly" = "weeks"))),
-  column(3,
+  column(4,
          selectInput("frequency", "Data Freq.",
                      c("Monthly" = "monthly",
                        "Daily" = "daily"))),
@@ -1136,7 +1146,7 @@ renderPlot({
 
 ### **Portfolio Construction**
 
-#### **<확인사항>**
+##### **<확인사항>**
 
 - 사이드바의 ETF 유니버스를 기반으로 최적화
 
@@ -1144,7 +1154,7 @@ renderPlot({
 
 - **_사이드바 업데이트시 현재 페이지 활성화되어 있으면 작동 안함!_**
 
-#### **<포트폴리오 최적화 방법론>**
+##### **<포트폴리오 최적화 방법론>**
 
 - **<[Understanding Risk Parity - CME Group](https://www.cmegroup.com/education/files/understanding-risk-parity-2013-06.pdf)>**
 
@@ -1154,7 +1164,7 @@ renderPlot({
 
 - **<[Maximum Diversification - Man](https://www.man.com/maninstitute/ahl-explains-maximum-diversification)>**
 
-#### **<실행>**
+##### **<실행>**
 
 ```{r}
 
@@ -1459,7 +1469,7 @@ renderValueBox({
 
 ### **Portfolio Allocation Rules**
 
-#### **<실행>**
+##### **<실행>**
 
 ```{r}
 
@@ -1467,11 +1477,11 @@ actionButton("go3", "Download & Simulate")
 
 ```
 
-#### **<확인사항>**
+##### **<확인사항>**
 
 - **_사이드바 업데이트시 현재 페이지 활성화되어 있으면 작동 안함!_**
 
-#### **<국면 판단 및 포트폴리오 배분>**
+##### **<국면 판단 및 포트폴리오 배분>**
 
  1) OECD CLI >= 100 & OECD CLI >= 최근 3개월 평균 : Expansion (주식 85%)
 
@@ -1481,7 +1491,7 @@ actionButton("go3", "Download & Simulate")
 
  4) OECD CLI < 100 & OECD CLI >= 최근 3개월 평균 : Recovery (주식 85%)
 
-#### **<데이터 출처 및 관련 자료>** 
+##### **<데이터 출처 및 관련 자료>** 
  - **<[Yahoo Finance](https://finance.yahoo.com/)>**
  
  - **<[OECD](https://data.oecd.org/leadind/composite-leading-indicator-cli.htm)>**
