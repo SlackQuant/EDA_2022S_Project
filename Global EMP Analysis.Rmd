@@ -1449,7 +1449,7 @@ renderValueBox({
 
 ```
 
-### **Current Target Equity Weight (OECD)**
+### **Current Target Equity Weight (Global)**
 
 ```{r}
 
@@ -1502,7 +1502,7 @@ actionButton("go3", "Download & Simulate")
  
  - **<[How good are early esimates of OECD Composite Leading Indicators?](https://www.oecd.org/sdd/leading-indicators/40182804.pdf)>**
 
-### **Cumulative Performance : Korea**
+### **Cumulative Performance : Korea  <[EWY](https://finance.yahoo.com/quote/EWY?p=EWY&.tsrc=fin-srch)>**
 
 ```{r}
 
@@ -1513,7 +1513,7 @@ renderPlot({
   agg_tbl_xts <- agg_tbl[, c(1, 8:13)] %>% 
   slice(-1) %>% 
   tk_xts(date_var = Date)
-colnames(agg_tbl_xts) <- c("Strategy_KR", "Strategy_US", "Strategy_OECD", "6:4_BM_KR", "6:4_BM_US", "6:4_BM_OECD")
+colnames(agg_tbl_xts) <- c("Strategy_KR", "Strategy_US", "Strategy_Global", "6:4_BM_KR", "6:4_BM_US", "6:4_BM_Global")
   
   chart.CumReturns(agg_tbl_xts[, c(1, 4)], wealth.index = TRUE, main = "Growth of $1", legend.loc = "topleft", plot.engine = "default")
  
@@ -1521,7 +1521,7 @@ colnames(agg_tbl_xts) <- c("Strategy_KR", "Strategy_US", "Strategy_OECD", "6:4_B
 
 ```
 
-### **Cumulative Performance : USA**
+### **Cumulative Performance : USA <[SPY](https://finance.yahoo.com/quote/SPY?p=SPY&.tsrc=fin-srch)>**
 
 ```{r}
 
@@ -1532,7 +1532,7 @@ renderPlot({
   agg_tbl_xts <- agg_tbl[, c(1, 8:13)] %>% 
   slice(-1) %>% 
   tk_xts(date_var = Date)
-colnames(agg_tbl_xts) <- c("Strategy_KR", "Strategy_US", "Strategy_OECD", "6:4_BM_KR", "6:4_BM_US", "6:4_BM_OECD")
+colnames(agg_tbl_xts) <- c("Strategy_KR", "Strategy_US", "Strategy_Global", "6:4_BM_KR", "6:4_BM_US", "6:4_BM_Global")
   
   chart.CumReturns(agg_tbl_xts[, c(2, 5)], wealth.index = TRUE, main = "Growth of $1", legend.loc = "topleft", plot.engine = "default")
  
@@ -1540,7 +1540,7 @@ colnames(agg_tbl_xts) <- c("Strategy_KR", "Strategy_US", "Strategy_OECD", "6:4_B
 
 ```
 
-### **Cumulative Performance : OECD**
+### **Cumulative Performance : Global <[VT](https://finance.yahoo.com/quote/VT?p=VT&.tsrc=fin-srch)>**
 
 ```{r}
 
@@ -1551,7 +1551,7 @@ renderPlot({
   agg_tbl_xts <- agg_tbl[, c(1, 8:13)] %>% 
   slice(-1) %>% 
   tk_xts(date_var = Date)
-colnames(agg_tbl_xts) <- c("Strategy_KR", "Strategy_US", "Strategy_OECD", "6:4_BM_KR", "6:4_BM_US", "6:4_BM_OECD")
+colnames(agg_tbl_xts) <- c("Strategy_KR", "Strategy_US", "Strategy_Global", "6:4_BM_KR", "6:4_BM_US", "6:4_BM_Global")
   
   chart.CumReturns(agg_tbl_xts[, c(3, 6)], wealth.index = TRUE, main = "Growth of $1", legend.loc = "topleft", plot.engine = "default")
  
@@ -1574,7 +1574,7 @@ renderTable({
   agg_tbl_xts <- agg_tbl[, c(1, 8:13)] %>% 
   slice(-1) %>% 
   tk_xts(date_var = Date)
-  colnames(agg_tbl_xts) <- c("Strategy_KR", "Strategy_US", "Strategy_OECD", "6:4_BM_KR", "6:4_BM_US", "6:4_BM_OECD")
+  colnames(agg_tbl_xts) <- c("Strategy_KR", "Strategy_US", "Strategy_Global", "6:4_BM_KR", "6:4_BM_US", "6:4_BM_Global")
 
   risk_free <- 0.02 / 12
   stack2 <- NULL
@@ -1628,7 +1628,6 @@ renderTable({
   agg_tbl_xts <- agg_tbl[, c(1, 8:13)] %>% 
   slice(-1) %>% 
   tk_xts(date_var = Date)
-  colnames(agg_tbl_xts) <- c("Strategy_KR", "Strategy_US", "Strategy_OECD", "6:4_BM_KR", "6:4_BM_US", "6:4_BM_OECD")
   
   stack3 <- NULL
   for (n in 1:(length(country) * 2)) {
@@ -1642,7 +1641,7 @@ renderTable({
            rename_index = "Year") %>%
     as_tibble()
   
-  colnames(strategy_rtns_yr) <- c("Year", "Strategy_KR", "Strategy_US", "Strategy_OECD", "6:4_BM_KR", "6:4_BM_US", "6:4_BM_OECD")
+  colnames(strategy_rtns_yr) <- c("Year", "Strategy_KR", "Strategy_US", "Strategy_Global", "6:4_BM_KR", "6:4_BM_US", "6:4_BM_Global")
   
   strategy_rtns_yr$Year <- format(strategy_rtns_yr$Year, "%Y")
   strategy_rtns_yr[, -1] <- strategy_rtns_yr[, -1] * 100
@@ -1692,9 +1691,6 @@ df2 <- tbl2 %>%
 df2 %>% head(20) %>%
   kable(format="html", escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-  # column_spec(1, width = "6em") %>%
-  # column_spec(2, width = "35em")
-  # column_spec(3, width = "6em")
 
 ```
 
@@ -1731,8 +1727,6 @@ df <- tbl %>%
 df %>% head(20) %>%
   kable(format="html", escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-  # column_spec(1, width = "6em") %>%
-  # column_spec(2, width = "35em")
 
 ```
 
@@ -1785,9 +1779,6 @@ df3 <- tbl3 %>%
 df3 %>% head(20) %>%
   kable(format="html", escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-  # column_spec(1, width = "6em") %>%
-  # column_spec(2, width = "35em") %>% 
-  # column_spec(3, width = "6em")
 
 ```
 
@@ -1830,8 +1821,5 @@ df4 <- tbl4 %>%
 df4 %>% head(30) %>%
   kable(format="html", escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-  # column_spec(1, width = "6em") %>%
-  # column_spec(2, width = "35em") %>% 
-  # column_spec(3, width = "6em")
 
 ```
