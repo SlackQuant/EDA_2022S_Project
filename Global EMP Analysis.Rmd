@@ -702,25 +702,6 @@ cli_strategy <- eventReactive(input$go3, {
   
   names(cli_agg) <- c("Month", country)
   
-  # cli_agg$Month <- str_c(cli_agg$Month, "-01") %>% 
-  #   as.Date() %>% 
-  #   format(., "%Y-%m")
-  
-  # cli_agg[1, 2]
-  # cli_agg[, "KOR"]
-  # cli_agg$KOR
-  
-  # a <- "2010-10"
-  # str(a)
-  # b <- as.Date(a)
-  # str(b)
-  
-  # outfile <- "ETF_agg.xlsx"
-  # write_xlsx(ETF_agg, outfile)
-  # 
-  # outfile2 <- "cli_agg.xlsx"
-  # write_xlsx(cli_agg, outfile2)
-  
   # Strategy
   if (nrow(ETF_agg_m) != nrow(cli_agg)) {
     ETF_agg_m <- ETF_agg_m[-nrow(ETF_agg_m), ]
@@ -730,10 +711,6 @@ cli_strategy <- eventReactive(input$go3, {
   
   agg_tbl <- cbind(ETF_agg_m, cli_agg) %>% 
     select(-Month)
-  
-  # agg_tbl[, "OECD"]
-  # a <- "OECD"
-  # agg_tbl[ , a]
   
   stack <- NULL
   for (i in country) {
@@ -803,6 +780,75 @@ cli_strategy <- eventReactive(input$go3, {
   
 })
 
+AAA_strategy_ret <- eventReactive(input$go4, {
+
+  # 1) 글로벌 10개 내외 자산 중 과거 12개월(또는 12개월 이내 평균수익률) 수익률이 높은 n개 자산을 선택
+  # 2) 최소분산 포트폴리오를 구성, 개별 투자비중은 최소 10%, 최대 30% 등 적정 제약조건을 설정
+  # 3) 월간 리밸런싱
+  
+  # Adaptive Asset Allocation : A Primer    SSRN 2328254
+  # A Quantitative Approach to Tactical Asset Allocation
+  
+  ## Adaptive Asset Allocation : Momentum + min. variance
+  
+  symbols <- c('SPY' , # 미국 주식
+               'QQQ' , # 미국 나스닥
+               'IEV' , # 유럽 주식
+               'EWY' , # 한국 주식
+               'EEM' , # 이머징 주식
+               'TLT' , # 미국 장기채
+               'IEF' , # 미국 중기채
+               'AGG' , # 미국 회사채
+               'RWX' , # 글로벌 리츠
+               'GLD' , # 금
+               'DBC'   # 상품
+  )
+  
+  getSymbols(symbols, src = 'yahoo')
+  
+  prices = do.call(cbind,
+                   lapply(symbols, function(x) Ad(get(x)))) %>% 
+    setNames(symbols)
+  
+  rets = Return.calculate(prices) %>% 
+    na.omit()
+
+})
+
+AAA_strategy_wts <- eventReactive(input$go4, {
+
+  rets <- AAA_strategy_ret()
+  
+  # 백테스트에 사용되는 각종 값을 사전에 정의
+  ep = endpoints(rets, on = 'months')           # 매월 말일의 위치를 구함
+  wts = list()                                  # 매월의 투자비중이 들어갈 빈 리스트를 wts에 설정
+  lookback = 12                                 # 수익률을 측정할 과거 n 기간을 12개월로 설정
+  wt_zero = rep(0, 11) %>%                      # rep() 함수를 통해 비중이 들어갈 0으로 이루어진 벡터를 만들고 이름을 설정
+    setNames(colnames(rets))
+  
+  for (i in (lookback + 1) : length(ep)) {      # for loop 구문을 통해 매월 말 과거 12개월 수익률을 구한 후 비중을 계산하므로, 처음시작은 i+1인 13부터...  
+    sub_ret = rets[ep[i - lookback] : ep[i], ]  # 과거 12개월 간 수익률을 찾은 후 sub_ret에 저장
+    cum = Return.cumulative(sub_ret)            # 해당 기간의 자산별 누적수익률을 구함
+    
+    K = rank(-cum) <= 5                         # rank() 함수를 통해 수익률 상위 5개 자산을 선택, 내림차순으로 정렬해야 하므로 마이너스 붙여줌
+    covmat = cov(sub_ret[, K])                  # cov() 함수를 통해 수익률 상위 5개 자산의 분산-공분산 행렬을 구하기
+    
+    # 임시로 비중이 저장될 wt변수에 위에서 만든 0벡터(wt_zero)를 입력한 후 optimalPortfolio()함수를 통해 최소분산 포트폴리오를 구성하는 해를 찾음
+    # 개별 투자비중의 제한은 최소 10%, 최대 30%를 설정하며, 구해진 해를 wt의 K번째 값에 입력
+    wt = wt_zero
+    wt[K] = optimalPortfolio(covmat,        
+                             control = list(type = 'minvol',
+                                            constraint = 'user',
+                                            LB = rep(0.10, 5),
+                                            UB = rep(0.30, 5)))
+    
+    wts[[i]] = xts(t(wt), order.by = index(rets[ep[i]]))  # 위에서 만들어진 벡터를 xts()를 통해 시계열 형태로 바꾼 후 wts의 i번째 리스트에 저장
+  }
+  
+  wts = do.call(rbind, wts)  # for loop 구문이 끝난 후 do.call() 함수를 통해 투자비중이 저장된 리스트를 테이블 형태로 바꿔줌
+
+})
+  
 ```
 
 # **Portfolio Strategy Simulation**
@@ -1467,7 +1513,7 @@ renderValueBox({
 
 ## Row {data-height="750"}
 
-### **Portfolio Allocation Rules**
+### **Portfolio Allocation Rule**
 
 ##### **<실행>**
 
@@ -1652,6 +1698,253 @@ renderTable({
     
 ```
 
+# **[TAA] Adaptive Asset Allocation**
+
+## Row {data-height="750"}
+
+### **Portfolio Allocation Rule**
+
+##### **<실행>**
+
+```{r}
+
+actionButton("go4", "Download & Simulate")   
+
+```
+
+##### **<확인사항>**
+
+- **_사이드바 업데이트시 현재 페이지 활성화되어 있으면 작동 안함!_**
+
+##### **<포트폴리오 배분>**
+
+ 1) 12개월 이내 모멘텀 스코어 기준 상위 5개 자산 선정
+
+ 2) 최소분산최적화 (Minimum Variance Optimization)를 통한 포트폴리오 구성
+
+##### **<데이터 출처 및 관련 자료>** 
+ - **<[Yahoo Finance](https://finance.yahoo.com/)>**
+ 
+ - **<[Adaptive Asset Allocation](https://allocatesmartly.com/adam-butler-gestaltu-adaptive-asset-allocation/)>**
+ 
+ - **<[Adaptive Asset Allocation: A Primer](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2328254)>**
+ 
+ - **<[Adaptive Asset Allocation: Combining Momentum with Minimum Variance](https://cssanalytics.wordpress.com/2012/07/17/adaptive-asset-allocation-combining-momentum-with-minimum-variance/)>**
+ 
+ - **<[Adaptive Asset Allocation – Systematic Investor](https://systematicinvestor.wordpress.com/2012/08/14/adaptive-asset-allocation/)>**
+ 
+ - **<[Adaptive Asset Allocation – Sensitivity Analysis](https://systematicinvestor.wordpress.com/2012/08/21/adaptive-asset-allocation-sensitivity-analysis/)>**
+ 
+### **Cumulative Performance**
+
+```{r}
+
+renderPlot({
+  
+  rets <- AAA_strategy_ret()
+  wts <- AAA_strategy_wts()
+  
+  AAA = Return.portfolio(rets, wts, verbose = TRUE)
+  
+  # turnover
+  AAA$turnover = xts(
+    rowSums(abs(AAA$BOP.Weight -
+                  timeSeries::lag(AAA$EOP.Weight)),
+            na.rm = TRUE),
+    order.by = index(AAA$BOP.Weight))
+
+  # 매매비용 등 반영
+  fee = 0.002
+  AAA$net = AAA$returns - AAA$turnover * fee
+  
+  ## 성과정리
+  
+  tbl_agg <- cbind(AAA$returns, AAA$net, rets$SPY, rets$EWY, rets$EEM) %>% 
+    na.omit() %>% 
+    setNames(c('Adaptive AA', 'Adaptive AA (after fee)', 'US', 'KR', 'EM'))
+  
+  tbl_agg %>% 
+    charts.PerformanceSummary(main = 'Adaptive Asset Allocation')
+  
+})
+
+```
+
+## Row {.tabset .tabset-fade}
+
+### **Strategy Performance**
+
+```{r}
+
+renderTable({
+  
+  rets <- AAA_strategy_ret()
+  wts <- AAA_strategy_wts()
+  
+  AAA = Return.portfolio(rets, wts, verbose = TRUE)
+  
+  # turnover
+  AAA$turnover = xts(
+    rowSums(abs(AAA$BOP.Weight -
+                  timeSeries::lag(AAA$EOP.Weight)),
+            na.rm = TRUE),
+    order.by = index(AAA$BOP.Weight))
+
+  # 매매비용 등 반영
+  fee = 0.002
+  AAA$net = AAA$returns - AAA$turnover * fee
+  
+  ## 성과정리
+  
+  tbl_agg <- cbind(AAA$returns, AAA$net, rets$SPY, rets$EWY, rets$EEM) %>% 
+    na.omit() %>% 
+    setNames(c('Adaptive AA', 'Adaptive AA (after fee)', 'US', 'KR', 'EM'))
+  
+  risk_free <- 0.02 / 252
+  stack <- NULL
+  
+  for (m in 1:5) {
+    
+    rtn_cum <- Return.cumulative(tbl_agg[, m]) # 누적수익률
+    rtn_yr <- Return.annualized(tbl_agg[, m]) # 연율화 수익률(기하)
+    
+    std_yr <- StdDev.annualized(tbl_agg[, m]) # 연율화 변동성
+    sr_yr <- SharpeRatio.annualized(tbl_agg[, m], Rf = risk_free, geometric = TRUE) # 기하평균 기준 연율화 수익률
+    MDD <- maxDrawdown(tbl_agg[, m]) # 최대 낙폭
+    cr_yr <- CalmarRatio(tbl_agg[, m])  # 연율화 수익률을 최대낙폭으로 나눈 값
+    
+    agg_temp <- rbind(rtn_cum, rtn_yr, std_yr, sr_yr, MDD, cr_yr)
+    stack <- cbind(stack, agg_temp)
+    
+  }
+  
+  # 티블로 바꿔주고 테이블 정리
+  strategy_perf <- stack %>% 
+    tk_tbl(preserve_index = TRUE,
+           rename_index = "Risk/Return") %>% 
+    as_tibble()
+  
+  
+  strategy_perf[c(1, 2, 3, 5), -1] <- strategy_perf[c(1, 2, 3, 5), -1] * 100
+  strategy_perf <- strategy_perf %>%
+    mutate_if(is.numeric, round, 2)
+  strategy_perf$`Risk/Return`[1] <- "Cumulative Return (%)"
+  strategy_perf$`Risk/Return`[2] <- "Annualized Return (%)"
+  strategy_perf$`Risk/Return`[3] <- "Annualized Standard Deviation (%)"
+  strategy_perf$`Risk/Return`[5] <- "MDD (%)"
+ 
+  strategy_perf
+  
+})
+
+```
+
+### **Strategy Annual Returns (%)**
+
+```{r}
+  
+renderTable({
+ 
+  rets <- AAA_strategy_ret()
+  wts <- AAA_strategy_wts()
+  
+  AAA = Return.portfolio(rets, wts, verbose = TRUE)
+  
+  # turnover
+  AAA$turnover = xts(
+    rowSums(abs(AAA$BOP.Weight -
+                  timeSeries::lag(AAA$EOP.Weight)),
+            na.rm = TRUE),
+    order.by = index(AAA$BOP.Weight))
+
+  # 매매비용 등 반영
+  fee = 0.002
+  AAA$net = AAA$returns - AAA$turnover * fee
+  
+  ## 성과정리
+  
+  tbl_agg <- cbind(AAA$returns, AAA$net, rets$SPY, rets$EWY, rets$EEM) %>% 
+    na.omit() %>% 
+    setNames(c('Adaptive AA', 'Adaptive AA (after fee)', 'US', 'KR', 'EM'))
+  
+  stack2 <- NULL
+  for (n in 1:5) {
+    rtns_yr <- apply.yearly(tbl_agg[, n], Return.cumulative)
+    stack2 <- cbind(stack2, rtns_yr)
+  }
+  
+  # 티블로 바꿔주고 테이블 정리
+  strategy_rtns_yr <- stack2 %>%
+    tk_tbl(preserve_index = TRUE,
+           rename_index = "Year") %>%
+    as_tibble() %>% 
+    setNames(c('Year', 'Adaptive AA', 'Adaptive AA (after fee)', 'US', 'KR', 'EM'))
+  
+  strategy_rtns_yr$Year <- format(strategy_rtns_yr$Year, "%Y")
+  strategy_rtns_yr[, -1] <- strategy_rtns_yr[, -1] * 100
+  
+  strategy_rtns_yr
+ 
+})  
+  
+```  
+
+### **Weights History (%)**
+
+```{r}
+  
+renderTable({
+  
+  rets <- AAA_strategy_ret()
+  wts <- AAA_strategy_wts()
+  
+  wts[, -1] <- wts[, -1] * 100
+  
+  wts_tbl <- wts %>% 
+    tk_tbl(preserve_index = TRUE,
+           rename_index = "Month") %>% 
+    as_tibble()
+  
+  wts_tbl$Month <- format(wts_tbl$Month, "%Y-%m")
+  
+  wts_tbl
+  
+})
+
+```
+
+### **Weights History (Chart)**
+
+```{r}
+  
+renderPlot({
+
+  wts <- AAA_strategy_wts()
+  
+  wts %>% fortify.zoo() %>%
+    gather(key, value, -Index) %>%
+    mutate(Index = as.Date(Index)) %>%
+    mutate(key = factor(key, levels = unique(key))) %>%
+    ggplot(aes(x = Index, y = value)) +
+    geom_area(aes(color = key, fill = key),
+              position = 'stack') +
+    xlab(NULL) + ylab(NULL) +  theme_bw() +
+    scale_x_date(date_breaks="years", date_labels="%Y",
+                 expand = c(0, 0)) +
+    scale_y_continuous(expand = c(0, 0)) +
+    theme(plot.title = element_text(hjust = 0.5,
+                                    size = 12),
+          legend.position = 'bottom',
+          legend.title = element_blank(),
+          axis.text.x = element_text(angle = 45,
+                                     hjust = 1, size = 8),
+          panel.grid.minor.x = element_blank()) +
+    guides(color = guide_legend(byrow = TRUE))
+
+})  
+  
+```  
+  
 # **[Research] Quantitative Research**
 
 ## Row
