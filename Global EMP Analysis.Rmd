@@ -19,7 +19,7 @@ output:
 
 ```{r setup, message = FALSE}
 
-# 로그수익률 기준 선택 추가하기
+# 로그수익률 기준 선택 추가할 것
 
 library(tidyverse)
 library(tidyquant)
