@@ -244,7 +244,7 @@ ETF_rtn <- eventReactive(input$go, {
     as.data.frame() %>% 
     cbind(ETF_short_target$Date, .)
   
-  names(ETF_agg) <- c("Date", symbols)
+  names(ETF_agg) <- c("Date", all_of(symbols))
   ETF_agg[, "Date"] = as.Date(ETF_agg$Date)
   
   ## Save as XLSX
@@ -556,7 +556,7 @@ risk_parity <- eventReactive(input$go2, {
   w = getx(opt) %>% drop()     # getx() 함수를 통해 해를 추출.. drop()을 통해 벡터 형태로 변환
   w = (w / sum(w)) %>% 
     round(., 4) %>% 
-    setNames(colnames(symbols))
+    setNames(colnames(all_of(symbols)))
 
 })
   
@@ -643,7 +643,7 @@ cli_strategy <- eventReactive(input$go3, {
   ETF_agg <- ETF_agg %>% 
     as.data.frame() %>% 
     cbind(ETF_short_target$Date, .)
-  names(ETF_agg) <- c("Date", symbols)
+  names(ETF_agg) <- c("Date", all_of(symbols))
   
   ETF_agg[, "Date"] = as.Date(ETF_agg$Date)
   
@@ -808,7 +808,7 @@ AAA_strategy_ret <- eventReactive(input$go4, {
   
   prices = do.call(cbind,
                    lapply(symbols, function(x) Ad(get(x)))) %>% 
-    setNames(symbols)
+    setNames(all_of(symbols))
   
   rets = Return.calculate(prices) %>% 
     na.omit()
@@ -1288,7 +1288,7 @@ renderTable({
   
   tab_target <- rbind(max_sr * 100, min_var * 100) %>%
     round(., 2) %>%
-    select(symbols) %>% 
+    select(all_of(symbols)) %>% 
     rbind(., round(risk_parity_w * 100, 2), round(max_diver_w * 100, 2)) %>% 
     mutate(Portfolio = c("Tangency Port.(Max Sharpe)", "Minimum Variance Port.", "Risk Parity", "Most Diversified")) %>% 
     select(Portfolio, everything())
