@@ -5,7 +5,7 @@ account: slackquant
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 6407486
-bundleId: 5987347
+bundleId: 5987420
 url: https://slackquant.shinyapps.io/eda_2022s_project/
-when: 1654644875.66288
-lastSyncTime: 1654644875.6629
+when: 1654647409.25329
+lastSyncTime: 1654647409.25335

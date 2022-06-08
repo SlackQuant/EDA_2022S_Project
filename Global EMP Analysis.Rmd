@@ -1177,8 +1177,8 @@ renderPlot({
     ggplot(aes(x = returns)) +
     geom_histogram(alpha = 0.25, binwidth = .01, fill = "cornflowerblue") +
     geom_density(geom = "line", size = 1, color = "red") +
-    xlab("returns") +
-    ylab("distribution") +
+    xlab("Returns") +
+    ylab("Distribution") +
     theme_update(plot.title = element_text(hjust = 0.5)) +
     ggtitle("Portfolio Histogram and Density")
 
@@ -1410,8 +1410,8 @@ renderPlot({
     guides(fill = "none") +
     facet_wrap(~asset) +
     ggtitle("Returns Since Inception") +
-    xlab("returns") +
-    ylab("distribution") +
+    xlab("Returns") +
+    ylab("Distribution") +
     theme_update(plot.title = element_text(hjust = 0.5))
 
 })
