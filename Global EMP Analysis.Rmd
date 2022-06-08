@@ -1898,7 +1898,7 @@ renderTable({
   rets <- AAA_strategy_ret()
   wts <- AAA_strategy_wts()
   
-  wts[, -1] <- wts[, -1] * 100
+  wts <- wts * 100
   
   wts_tbl <- wts %>% 
     tk_tbl(preserve_index = TRUE,
