@@ -45,6 +45,7 @@ library(RiskPortfolios)
 # Sidebar {.sidebar data-width="480"}
 
 ##### **Portfolio Construction**
+
 - PC-Only, 웹 브라우저 글꼴 크기 80~90% 설정
 
 - 시작일보다 늦게 상장된 ETF가 존재하는 경우,
@@ -52,6 +53,7 @@ library(RiskPortfolios)
   해당 ETF 상장일 부터 산출
 
 - **[Yahoo Finance](https://finance.yahoo.com/)**
+<br>
 
 ```{r}
 
@@ -169,6 +171,14 @@ ETF_rtn <- eventReactive(input$go, {
                    input$w7, input$w8, input$w9, input$w10, input$w11)), "%")
   }
 
+  # with progress bar         
+  withProgress(message = 'In Progress', value = 0, {
+            
+                        # increment progress bar
+                        incProgress(0.8)
+                        # stop eval to see progress bar long enough :)
+                        Sys.sleep(0.0)
+                        
   # 아래부터는 앞에서 사용한 코드흐름...(다만 심볼, 비중, 시작일에 대한 유저인풋을 사용한다는 점)
   symbols <- c(input$ETF1, input$ETF2, input$ETF3, input$ETF4, input$ETF5, input$ETF6,
                input$ETF7, input$ETF8, input$ETF9, input$ETF10, input$ETF11)
@@ -269,7 +279,9 @@ ETF_rtn <- eventReactive(input$go, {
     spread(asset, period.returns) %>%
     select(Date, all_of(symbols)) %>%
     slice(-1)
-  
+
+  })
+    
 })
 
 # ETF 가격 불러와서 ETF 수익률 합치고 long 포맷까지 만든 함수
@@ -580,6 +592,14 @@ max_diver <- eventReactive(input$go2, {
 
 cli_strategy <- eventReactive(input$go3, {
   
+  # with progress bar         
+  withProgress(message = 'In Progress', value = 0, {
+            
+                        # increment progress bar
+                        incProgress(0.8)
+                        # stop eval to see progress bar long enough :)
+                        Sys.sleep(0.0)
+  
   symbols <- c('EWY', # 한국 주식
                'SPY', # 미국 주식
                'VT',  # 전세계 주식
@@ -778,6 +798,8 @@ cli_strategy <- eventReactive(input$go3, {
   # outfile <- "strategy_agg.xlsx"
   # write_xlsx(agg_tbl, outfile)
   
+  })
+  
 })
 
 AAA_strategy_ret <- eventReactive(input$go4, {
@@ -790,6 +812,13 @@ AAA_strategy_ret <- eventReactive(input$go4, {
   # A Quantitative Approach to Tactical Asset Allocation
   
   ## Adaptive Asset Allocation : Momentum + min. variance
+  
+  withProgress(message = 'In Progress', value = 0, {
+            
+                        # increment progress bar
+                        incProgress(0.8)
+                        # stop eval to see progress bar long enough :)
+                        Sys.sleep(0.0)
   
   symbols <- c('SPY' , # 미국 주식
                'QQQ' , # 미국 나스닥
@@ -812,6 +841,8 @@ AAA_strategy_ret <- eventReactive(input$go4, {
   
   rets = Return.calculate(prices) %>% 
     na.omit()
+  
+  })
 
 })
 
