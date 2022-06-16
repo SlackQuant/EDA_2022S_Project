@@ -592,6 +592,9 @@ max_diver <- eventReactive(input$go2, {
 
 cli_strategy <- eventReactive(input$go3, {
   
+  # Sys.getlocale() #인코딩정보 확인
+  # Sys.setlocale("LC_ALL", "C") #초기 설정으로 변경 (C)
+
   # with progress bar         
   withProgress(message = 'In Progress', value = 0, {
             
