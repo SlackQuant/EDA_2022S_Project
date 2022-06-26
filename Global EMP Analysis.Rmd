@@ -123,7 +123,11 @@ fluidRow(
   column(3,
          textInput("ETF11", "ETF 11", "DBC")),
   column(3,
-         numericInput("w11", "Portf. %", 5, min = 0, max = 100))
+         numericInput("w11", "Portf. %", 5, min = 0, max = 100)),
+  column(3,
+         textInput("ETF12", "ETF 12", "SHY")),
+  column(3,
+         numericInput("w12", "Portf. %", 0, min = 0, max = 100))
 )
 
 fluidRow( 
@@ -165,10 +169,10 @@ ETF_rtn <- eventReactive(input$go, {
   
   {
   if(sum(input$w1, input$w2, input$w3, input$w4, input$w5, input$w6,
-         input$w7, input$w8, input$w9, input$w10, input$w11) != 100) 
+         input$w7, input$w8, input$w9, input$w10, input$w11, input$w12) != 100) 
     stop(str_c("The portfolio weights must sum to 100%! Currently ", 
                sum(input$w1, input$w2, input$w3, input$w4, input$w5, input$w6,
-                   input$w7, input$w8, input$w9, input$w10, input$w11)), "%")
+                   input$w7, input$w8, input$w9, input$w10, input$w11, input$w12)), "%")
   }
 
   # with progress bar         
@@ -181,7 +185,7 @@ ETF_rtn <- eventReactive(input$go, {
                         
   # 아래부터는 앞에서 사용한 코드흐름...(다만 심볼, 비중, 시작일에 대한 유저인풋을 사용한다는 점)
   symbols <- c(input$ETF1, input$ETF2, input$ETF3, input$ETF4, input$ETF5, input$ETF6,
-               input$ETF7, input$ETF8, input$ETF9, input$ETF10, input$ETF11)
+               input$ETF7, input$ETF8, input$ETF9, input$ETF10, input$ETF11, input$ETF12)
   
   # validate(need(input$w1 + input$w2 + input$w3 + input$w4 + input$w5 +
   #                 input$w6 + input$w7 + input$w8 + input$w9 + input$w10 +
@@ -263,7 +267,7 @@ ETF_rtn <- eventReactive(input$go, {
   
   w <- c(input$w1/100, input$w2/100,
          input$w3/100, input$w4/100, input$w5/100, input$w6/100, input$w7/100,
-         input$w8/100, input$w9/100, input$w10/100, input$w11/100)
+         input$w8/100, input$w9/100, input$w10/100, input$w11/100, input$w12/100)
   
   ETF_returns_tq <-
     ETF_agg %>% 
@@ -296,7 +300,7 @@ portfolio_rtn <- eventReactive(input$go, {
   
   w <- c(input$w1/100, input$w2/100,
          input$w3/100, input$w4/100, input$w5/100, input$w6/100, input$w7/100,
-         input$w8/100, input$w9/100, input$w10/100, input$w11/100)
+         input$w8/100, input$w9/100, input$w10/100, input$w11/100, input$w12/100)
   
   portfolio_returns <-
     ETF_returns_long %>% 
@@ -316,7 +320,7 @@ ETF_cum_perf <- eventReactive(input$go, {
     tk_xts(date_var = Date)
   
   symbols <- c(input$ETF1, input$ETF2, input$ETF3, input$ETF4, input$ETF5, input$ETF6,
-               input$ETF7, input$ETF8, input$ETF9, input$ETF10, input$ETF11)
+               input$ETF7, input$ETF8, input$ETF9, input$ETF10, input$ETF11, input$ETF12)
   
   stack <- NULL
   if (input$frequency == "monthly") {
@@ -356,7 +360,7 @@ performance_yr <- eventReactive(input$go, {
     tk_xts(date_var = Date)
   
   symbols <- c(input$ETF1, input$ETF2, input$ETF3, input$ETF4, input$ETF5, input$ETF6,
-               input$ETF7, input$ETF8, input$ETF9, input$ETF10, input$ETF11)
+               input$ETF7, input$ETF8, input$ETF9, input$ETF10, input$ETF11, input$ETF12)
   
   stack2 <- NULL
   for (m in 1:length(symbols)) {
@@ -385,7 +389,7 @@ component_contr <- eventReactive(input$go, {
   
   w <- c(input$w1/100, input$w2/100,
          input$w3/100, input$w4/100, input$w5/100, input$w6/100, input$w7/100,
-         input$w8/100, input$w9/100, input$w10/100, input$w11/100)
+         input$w8/100, input$w9/100, input$w10/100, input$w11/100, input$w12/100)
   
   # create covariance matrix
   covmat <-
@@ -434,7 +438,7 @@ efficient_frontier <- eventReactive(input$go2, {
   cov_mat <- cov(ETF_rtn_xts) * n_ann
   
   symbols <- c(input$ETF1, input$ETF2, input$ETF3, input$ETF4, input$ETF5, input$ETF6,
-               input$ETF7, input$ETF8, input$ETF9, input$ETF10, input$ETF11)
+               input$ETF7, input$ETF8, input$ETF9, input$ETF10, input$ETF11, input$ETF12)
   
   # random weights 만들기, uniform distribution 난수
   wts <- runif(n = length(symbols)) 
@@ -539,7 +543,7 @@ risk_parity <- eventReactive(input$go2, {
     tk_xts(date_var = Date)
   
   symbols <- c(input$ETF1, input$ETF2, input$ETF3, input$ETF4, input$ETF5, input$ETF6,
-               input$ETF7, input$ETF8, input$ETF9, input$ETF10, input$ETF11)
+               input$ETF7, input$ETF8, input$ETF9, input$ETF10, input$ETF11, input$ETF12)
   
   # create covariance matrix
   covmat <-
@@ -823,6 +827,93 @@ AAA_strategy_ret <- eventReactive(input$go4, {
                         # stop eval to see progress bar long enough :)
                         Sys.sleep(0.0)
   
+    symbols <- c('SPY' , # 미국 주식
+                 'QQQ' , # 미국 나스닥
+                 'IEV' , # 유럽 주식
+                 'EWY' , # 한국 주식
+                 'EEM' , # 이머징 주식
+                 'TLT' , # 미국 장기채
+                 'IEF' , # 미국 중기채
+                 'AGG' , # 미국 회사채
+                 'RWX' , # 글로벌 리츠
+                 'GLD' , # 금
+                 'DBC' , # 상품
+                 'SHY'   # 단기채권
+    )
+    
+    getSymbols(symbols, src = 'yahoo')
+    
+    prices = do.call(cbind,
+                     lapply(symbols, function(x) Ad(get(x)))) %>% 
+      setNames(all_of(symbols))
+    
+    rets = Return.calculate(prices) %>% 
+      na.omit()
+  
+  })
+
+})
+
+AAA_strategy_wts <- eventReactive(input$go4, {
+
+  withProgress(message = 'In Progress', value = 0, {
+            
+                        # increment progress bar
+                        incProgress(0.8)
+                        # stop eval to see progress bar long enough :)
+                        Sys.sleep(0.0)
+                        
+    rets <- AAA_strategy_ret()
+    
+    # 백테스트에 사용되는 각종 값을 사전에 정의
+    ep = endpoints(rets, on = 'months')           # 매월 말일의 위치를 구함
+    wts = list()                                  # 매월의 투자비중이 들어갈 빈 리스트를 wts에 설정
+    lookback = 12                                 # 수익률을 측정할 과거 n 기간
+    wt_zero = rep(0, 12) %>%                      # rep() 함수를 통해 비중이 들어갈 0으로 이루어진 벡터를 만들고 이름을 설정
+      setNames(colnames(rets))
+    
+    for (i in (lookback + 1) : length(ep)) {      # for loop 구문을 통해 매월 말 과거 12개월 수익률을 구한 후 비중을 계산하므로, 처음시작은 i+1인 13부터...  
+      sub_ret_12 = rets[ep[i - lookback] : ep[i], ]         # 과거 12개월 간 수익률을 찾은 후 sub_ret에 저장
+      cum_12 = Return.cumulative(sub_ret_12)                # 해당 기간의 자산별 누적수익률을 구함
+      sub_ret_6 = rets[ep[i - lookback + 6] : ep[i], ]
+      cum_6 = Return.cumulative(sub_ret_6)
+      sub_ret_3 = rets[ep[i - lookback + 9] : ep[i], ]
+      cum_3 = Return.cumulative(sub_ret_3)
+      # sub_ret_1 = rets[ep[i - lookback + 12] : ep[i], ]
+      # cum_1 = Return.cumulative(sub_ret_1)
+      
+      cum = (cum_12 + cum_6 + cum_3) / 3
+      
+      K = rank(-cum) <= 5                         # rank() 함수를 통해 수익률 상위 5개 자산을 선택, 내림차순으로 정렬해야 하므로 마이너스 붙여줌
+      covmat = cov(sub_ret_12[, K])                  # cov() 함수를 통해 수익률 상위 5개 자산의 분산-공분산 행렬을 구하기
+      
+      # 임시로 비중이 저장될 wt변수에 위에서 만든 0벡터(wt_zero)를 입력한 후 optimalPortfolio()함수를 통해 최소분산 포트폴리오를 구성하는 해를 찾음
+      # 개별 투자비중의 제한은 최소 10%, 최대 30%를 설정하며, 구해진 해를 wt의 K번째 값에 입력
+      wt = wt_zero
+      wt[K] = optimalPortfolio(covmat,        
+                               control = list(type = 'minvol',
+                                              constraint = 'user',
+                                              LB = rep(0.10, 5),
+                                              UB = rep(0.30, 5)))
+      
+      wts[[i]] = xts(t(wt), order.by = index(rets[ep[i]]))  # 위에서 만들어진 벡터를 xts()를 통해 시계열 형태로 바꾼 후 wts의 i번째 리스트에 저장
+    }
+    
+    wts = do.call(rbind, wts)  # for loop 구문이 끝난 후 do.call() 함수를 통해 투자비중이 저장된 리스트를 테이블 형태로 바꿔줌
+    
+  })
+
+})
+
+FAA_strategy <- eventReactive(input$go5, {
+
+  withProgress(message = 'In Progress', value = 0, {
+            
+                        # increment progress bar
+                        incProgress(0.8)
+                        # stop eval to see progress bar long enough :)
+                        Sys.sleep(0.0)
+  
   symbols <- c('SPY' , # 미국 주식
                'QQQ' , # 미국 나스닥
                'IEV' , # 유럽 주식
@@ -833,56 +924,236 @@ AAA_strategy_ret <- eventReactive(input$go4, {
                'AGG' , # 미국 회사채
                'RWX' , # 글로벌 리츠
                'GLD' , # 금
-               'DBC'   # 상품
+               'DBC' , # 상품
+               'SHY'   # 단기채권
   )
   
+  # data
   getSymbols(symbols, src = 'yahoo')
-  
-  prices = do.call(cbind,
-                   lapply(symbols, function(x) Ad(get(x)))) %>% 
-    setNames(all_of(symbols))
-  
-  rets = Return.calculate(prices) %>% 
-    na.omit()
+  tmp <- list()
+  for(fund in symbols) {
+    tmp[[fund]] <- Ad(get(fund))
+  }
+
+  # always use a list hwne intending to cbind/rbind large quantities of objects
+  adPrices <- do.call(cbind, args = tmp)
+  colnames(adPrices) <- gsub(".Adjusted", "", colnames(adPrices))
+  return(adPrices)
   
   })
 
 })
 
-AAA_strategy_wts <- eventReactive(input$go4, {
+FAAreturns <- function(prices, monthLookback = 12,
+                       weightMom = 1, weightVol = .5, weightCor = .5,
+                       riskFreeName = "SHY", bestN = 5) {
 
-  rets <- AAA_strategy_ret()
+  # with progress bar         
+  withProgress(message = 'In Progress', value = 0, {
+            
+                        # increment progress bar
+                        incProgress(0.8)
+                        # stop eval to see progress bar long enough :)
+                        Sys.sleep(0.0)
   
-  # 백테스트에 사용되는 각종 값을 사전에 정의
-  ep = endpoints(rets, on = 'months')           # 매월 말일의 위치를 구함
-  wts = list()                                  # 매월의 투자비중이 들어갈 빈 리스트를 wts에 설정
-  lookback = 12                                 # 수익률을 측정할 과거 n 기간을 12개월로 설정
-  wt_zero = rep(0, 11) %>%                      # rep() 함수를 통해 비중이 들어갈 0으로 이루어진 벡터를 만들고 이름을 설정
-    setNames(colnames(rets))
+    returns <- Return.calculate(prices) %>% 
+      na.omit()
+    monthlyEps <- endpoints(prices, on = "months")
+    riskFreeCol <- grep(riskFreeName, colnames(prices))
+    tmp <- list()
+    dates <- list()
+    
+    for(i in 1:(length(monthlyEps) - monthLookback)) {
+    
+      #subset data
+      priceData <- prices[monthlyEps[i] : monthlyEps[i + monthLookback],]
+      returnsData <- returns[monthlyEps[i] : (monthlyEps[i+monthLookback] - 1),]
+    
+      #perform computations
+      momentum_12 <- data.frame(t(t(priceData[nrow(priceData),])/t(priceData[1,]) - 1))
+      momentum_6 <- data.frame(t(t(priceData[nrow(priceData),])/t(priceData[nrow(priceData) / 2,]) - 1))
+      momentum_3 <- data.frame(t(t(priceData[nrow(priceData),])/t(priceData[nrow(priceData) - (nrow(priceData) / 4),]) - 1))
+      
+      momentum <- (momentum_12 + momentum_6 + momentum_3) / 3
+      priceData <- priceData[, momentum > 0] #remove securities with momentum < 0
+      returnsData <- returnsData[, momentum > 0]
+      momentum <- momentum[momentum > 0]
+      names(momentum) <- colnames(returnsData)
+      # momentum
+      
+      vol <- as.numeric(-sd.annualized(returnsData[(nrow(returnsData) / 2) : nrow(returnsData)]))
+      # sumCors <- -colSums(cor(priceData[endpoints(priceData, on="months")]))
+      sumCors <- -colSums(cor(returnsData[(nrow(returnsData) / 2) : nrow(returnsData)], use="complete.obs"))
+      stats <- data.frame(cbind(momentum, vol, sumCors))
+    
+      if(nrow(stats) > 1) {
+    
+        #perform ranking
+        ranks <- data.frame(apply(stats, 2, rank))
+        weightRankSum <- weightMom*ranks$momentum + weightVol*ranks$vol + weightCor*ranks$sumCors
+        totalRank <- rank(weightRankSum)
+    
+        #find top N values, from http://stackoverflow.com/questions/2453326/fastest-way-to-find-second-third-highest-lowest-value-in-vector-or-column
+        upper <- length(names(returnsData))
+        lower <- max(upper-bestN+1, 1)
+        topNvals <- sort(totalRank, partial=seq(from=upper, to=lower))[c(upper:lower)]
+    
+        #compute weights
+        longs <- totalRank %in% topNvals #invest in ranks length - bestN or higher (in R, rank 1 is lowest)
+        longs <- longs/sum(longs) #equal weight all candidates
+        longs[longs > 1/bestN] <- 1/bestN #in the event that we have fewer than top N invested into, lower weights to 1/top N
+        names(longs) <- rownames(ranks)
+    
+      } else if(nrow(stats) == 1) { #only one security had positive momentum
+        longs <- 1/bestN
+        names(longs) <- rownames(stats)
+      } else { #no securities had positive momentum
+        longs <- 1
+        names(longs) <- riskFreeName
+      }
+    
+      #append removed names (those with momentum < 0)
+      removedZeroes <- rep(0, ncol(returns)-length(longs))
+      names(removedZeroes) <- names(returns)[!names(returns) %in% names(longs)]
+      longs <- c(longs, removedZeroes)
+    
+      #reorder to be in the same column order as original returns/prices
+      longs <- data.frame(t(longs))
+      longs <- longs[, names(returns)]
   
-  for (i in (lookback + 1) : length(ep)) {      # for loop 구문을 통해 매월 말 과거 12개월 수익률을 구한 후 비중을 계산하므로, 처음시작은 i+1인 13부터...  
-    sub_ret = rets[ep[i - lookback] : ep[i], ]  # 과거 12개월 간 수익률을 찾은 후 sub_ret에 저장
-    cum = Return.cumulative(sub_ret)            # 해당 기간의 자산별 누적수익률을 구함
+      #append lists
+      tmp[[i]] <- longs
+      dates[[i]] <- index(returnsData)[nrow(returnsData)]
+    }
     
-    K = rank(-cum) <= 5                         # rank() 함수를 통해 수익률 상위 5개 자산을 선택, 내림차순으로 정렬해야 하므로 마이너스 붙여줌
-    covmat = cov(sub_ret[, K])                  # cov() 함수를 통해 수익률 상위 5개 자산의 분산-공분산 행렬을 구하기
+    weights <- do.call(rbind, tmp)
+    dates <- do.call(c, dates)
+    weights <- xts(weights, order.by=as.Date(dates))
+    weights[, riskFreeCol] <- weights[, riskFreeCol] + 1 - rowSums(weights)
+    strategyReturns <- Return.rebalancing(R = returns, weights = weights, geometric = FALSE)
+    return(strategyReturns)
     
-    # 임시로 비중이 저장될 wt변수에 위에서 만든 0벡터(wt_zero)를 입력한 후 optimalPortfolio()함수를 통해 최소분산 포트폴리오를 구성하는 해를 찾음
-    # 개별 투자비중의 제한은 최소 10%, 최대 30%를 설정하며, 구해진 해를 wt의 K번째 값에 입력
-    wt = wt_zero
-    wt[K] = optimalPortfolio(covmat,        
-                             control = list(type = 'minvol',
-                                            constraint = 'user',
-                                            LB = rep(0.10, 5),
-                                            UB = rep(0.30, 5)))
-    
-    wts[[i]] = xts(t(wt), order.by = index(rets[ep[i]]))  # 위에서 만들어진 벡터를 xts()를 통해 시계열 형태로 바꾼 후 wts의 i번째 리스트에 저장
-  }
-  
-  wts = do.call(rbind, wts)  # for loop 구문이 끝난 후 do.call() 함수를 통해 투자비중이 저장된 리스트를 테이블 형태로 바꿔줌
+  })
+}
 
+FAA_strategy_ret <- eventReactive(input$go5, {
+  
+  adPrices <- FAA_strategy()
+  
+  FAA_basic <- FAAreturns(adPrices)
+  bestN4 <- FAAreturns(adPrices, bestN=4)
+  N5vol1cor1 <- FAAreturns(adPrices, weightVol = 1, weightCor = 1)
+  minRisk <- FAAreturns(adPrices, weightMom = 0, weightVol=1, weightCor=1)
+  pureMomentum <- FAAreturns(adPrices, weightMom=1, weightVol=0, weightCor=0)
+  maxDecor <- FAAreturns(adPrices, weightMom=0, weightVol=0, weightCor=1)
+  momDecor <- FAAreturns(adPrices, weightMom=1, weightVol=0, weightCor=1)
+
+  all <- cbind(FAA_basic, bestN4, N5vol1cor1, minRisk, pureMomentum, maxDecor, momDecor)
+  colnames(all) <- c("FAA_basic", "N4", "vol_1_cor_1", "minRisk", "pureMomentum", "maxDecor", "momDecor")
+  
+  return(all)
+  
 })
+
+FAAweights <- function(prices, monthLookback = 12,
+                       weightMom = 1, weightVol = .5, weightCor = .5,
+                       riskFreeName = "SHY", bestN = 5) {
+
+  withProgress(message = 'In Progress', value = 0, {
+            
+                        # increment progress bar
+                        incProgress(0.8)
+                        # stop eval to see progress bar long enough :)
+                        Sys.sleep(0.0)
   
+    returns <- Return.calculate(prices) %>% 
+      na.omit()
+    monthlyEps <- endpoints(prices, on = "months")
+    riskFreeCol <- grep(riskFreeName, colnames(prices))
+    tmp <- list()
+    dates <- list()
+    
+    for(i in 1:(length(monthlyEps) - monthLookback)) {
+    
+      #subset data
+      priceData <- prices[monthlyEps[i] : monthlyEps[i + monthLookback],]
+      returnsData <- returns[monthlyEps[i] : (monthlyEps[i+monthLookback] - 1),]
+    
+      #perform computations
+      momentum_12 <- data.frame(t(t(priceData[nrow(priceData),])/t(priceData[1,]) - 1))
+      momentum_6 <- data.frame(t(t(priceData[nrow(priceData),])/t(priceData[nrow(priceData) / 2,]) - 1))
+      momentum_3 <- data.frame(t(t(priceData[nrow(priceData),])/t(priceData[nrow(priceData) - (nrow(priceData) / 4),]) - 1))
+      
+      momentum <- (momentum_12 + momentum_6 + momentum_3) / 3
+      priceData <- priceData[, momentum > 0] #remove securities with momentum < 0
+      returnsData <- returnsData[, momentum > 0]
+      momentum <- momentum[momentum > 0]
+      names(momentum) <- colnames(returnsData)
+      # momentum
+      
+      vol <- as.numeric(-sd.annualized(returnsData[(nrow(returnsData) / 2) : nrow(returnsData)]))
+      # sumCors <- -colSums(cor(priceData[endpoints(priceData, on="months")]))
+      sumCors <- -colSums(cor(returnsData[(nrow(returnsData) / 2) : nrow(returnsData)], use="complete.obs"))
+      stats <- data.frame(cbind(momentum, vol, sumCors))
+    
+      if(nrow(stats) > 1) {
+    
+        #perform ranking
+        ranks <- data.frame(apply(stats, 2, rank))
+        weightRankSum <- weightMom*ranks$momentum + weightVol*ranks$vol + weightCor*ranks$sumCors
+        totalRank <- rank(weightRankSum)
+    
+        #find top N values, from http://stackoverflow.com/questions/2453326/fastest-way-to-find-second-third-highest-lowest-value-in-vector-or-column
+        upper <- length(names(returnsData))
+        lower <- max(upper-bestN+1, 1)
+        topNvals <- sort(totalRank, partial=seq(from=upper, to=lower))[c(upper:lower)]
+    
+        #compute weights
+        longs <- totalRank %in% topNvals #invest in ranks length - bestN or higher (in R, rank 1 is lowest)
+        longs <- longs/sum(longs) #equal weight all candidates
+        longs[longs > 1/bestN] <- 1/bestN #in the event that we have fewer than top N invested into, lower weights to 1/top N
+        names(longs) <- rownames(ranks)
+    
+      } else if(nrow(stats) == 1) { #only one security had positive momentum
+        longs <- 1/bestN
+        names(longs) <- rownames(stats)
+      } else { #no securities had positive momentum
+        longs <- 1
+        names(longs) <- riskFreeName
+      }
+    
+      #append removed names (those with momentum < 0)
+      removedZeroes <- rep(0, ncol(returns)-length(longs))
+      names(removedZeroes) <- names(returns)[!names(returns) %in% names(longs)]
+      longs <- c(longs, removedZeroes)
+    
+      #reorder to be in the same column order as original returns/prices
+      longs <- data.frame(t(longs))
+      longs <- longs[, names(returns)]
+  
+      #append lists
+      tmp[[i]] <- longs
+      dates[[i]] <- index(returnsData)[nrow(returnsData)]
+    }
+    
+    weights <- do.call(rbind, tmp)
+    dates <- do.call(c, dates)
+    weights <- xts(weights, order.by=as.Date(dates))
+    weights[, riskFreeCol] <- weights[, riskFreeCol] + 1 - rowSums(weights)
+    
+    return(weights)
+    
+  })
+}
+
+FAA_strategy_wt <- eventReactive(input$go5, {
+  
+  adPrices <- FAA_strategy()
+  
+  momDecor <- FAAweights(adPrices, weightMom=1, weightVol=0, weightCor=1)
+
+})  
+    
 ```
 
 # **Portfolio Strategy Simulation**
@@ -902,7 +1173,7 @@ ETF_returns_tq <- ETF_rtn()
     
   w <- c(input$w1/100, input$w2/100, input$w3/100, input$w4/100, input$w5/100,
          input$w6/100, input$w7/100, input$w8/100, input$w9/100, input$w10/100,
-         input$w11/100)
+         input$w11/100, input$w12/100)
     
   port_rtn_byinput = Return.portfolio(R = ETF_rtn_xts,
                                       weights = w,
@@ -936,7 +1207,7 @@ renderValueBox({
     
   w <- c(input$w1/100, input$w2/100, input$w3/100, input$w4/100, input$w5/100,
          input$w6/100, input$w7/100, input$w8/100, input$w9/100, input$w10/100,
-         input$w11/100)
+         input$w11/100, input$w12/100)
     
   port_rtn_byinput = Return.portfolio(R = ETF_rtn_xts,
                                       weights = w,
@@ -970,7 +1241,7 @@ renderValueBox({
     
   w <- c(input$w1/100, input$w2/100, input$w3/100, input$w4/100, input$w5/100,
          input$w6/100, input$w7/100, input$w8/100, input$w9/100, input$w10/100,
-         input$w11/100)
+         input$w11/100, input$w12/100)
     
   port_rtn_byinput = Return.portfolio(R = ETF_rtn_xts,
                                       weights = w,
@@ -1007,7 +1278,7 @@ renderPlot({
   
   w <- c(input$w1/100, input$w2/100, input$w3/100, input$w4/100, input$w5/100,
          input$w6/100, input$w7/100, input$w8/100, input$w9/100, input$w10/100,
-         input$w11/100)
+         input$w11/100, input$w12/100)
   
   port_rtn_byinput = Return.portfolio(R = ETF_rtn_xts,
                                       weights = w,
@@ -1037,10 +1308,10 @@ renderTable({
   
   w <- c(input$w1/100, input$w2/100, input$w3/100, input$w4/100, input$w5/100,
          input$w6/100, input$w7/100, input$w8/100, input$w9/100, input$w10/100,
-         input$w11/100)
+         input$w11/100, input$w12/100)
   
   symbols <- c(input$ETF1, input$ETF2, input$ETF3, input$ETF4, input$ETF5, input$ETF6,
-               input$ETF7, input$ETF8, input$ETF9, input$ETF10, input$ETF11)
+               input$ETF7, input$ETF8, input$ETF9, input$ETF10, input$ETF11, input$ETF12)
   
   stack2 <- NULL
   for (m in 1:length(symbols)) {
@@ -1087,7 +1358,7 @@ renderTable({
   
   w <- c(input$w1/100, input$w2/100, input$w3/100, input$w4/100, input$w5/100,
          input$w6/100, input$w7/100, input$w8/100, input$w9/100, input$w10/100,
-         input$w11/100)
+         input$w11/100, input$w12/100)
   
   port_rtn_byinput = Return.portfolio(R = ETF_rtn_xts,
                                       weights = w,
@@ -1095,7 +1366,7 @@ renderTable({
                                       verbose = TRUE)
   
   symbols <- c(input$ETF1, input$ETF2, input$ETF3, input$ETF4, input$ETF5, input$ETF6,
-               input$ETF7, input$ETF8, input$ETF9, input$ETF10, input$ETF11)
+               input$ETF7, input$ETF8, input$ETF9, input$ETF10, input$ETF11, input$ETF12)
   
   stack <- NULL
   if (input$frequency == "monthly") {
@@ -1309,7 +1580,7 @@ renderPlot({
 renderTable({
   
   symbols <- c(input$ETF1, input$ETF2, input$ETF3, input$ETF4, input$ETF5, input$ETF6,
-               input$ETF7, input$ETF8, input$ETF9, input$ETF10, input$ETF11)
+               input$ETF7, input$ETF8, input$ETF9, input$ETF10, input$ETF11, input$ETF12)
    
   portfolio_values <- efficient_frontier()
   # The minimum variance portfolio
@@ -1752,9 +2023,9 @@ actionButton("go4", "Download & Simulate")
 
 ##### **<포트폴리오 배분>**
 
- 1) 12개월 이내 모멘텀 스코어 기준 상위 5개 자산 선정
+ 1) 3, 6, 12개월 평균모멘텀 스코어 기준 상위 5개 자산 선정
 
- 2) 최소분산최적화 (Minimum Variance Optimization)를 통한 포트폴리오 구성
+ 2) 최소분산최적화 (Minimum Variance Optimization : 12개월)를 통한 포트폴리오 구성
 
 ##### **<데이터 출처 및 관련 자료>** 
  - **<[Yahoo Finance](https://finance.yahoo.com/)>**
@@ -1857,8 +2128,7 @@ renderTable({
     tk_tbl(preserve_index = TRUE,
            rename_index = "Risk/Return") %>% 
     as_tibble()
-  
-  
+ 
   strategy_perf[c(1, 2, 3, 5), -1] <- strategy_perf[c(1, 2, 3, 5), -1] * 100
   strategy_perf <- strategy_perf %>%
     mutate_if(is.numeric, round, 2)
@@ -1978,7 +2248,186 @@ renderPlot({
 })  
   
 ```  
+
+# **[TAA] Flexible Asset Allocation**
+
+## Row {data-height="750"}
+
+### **Portfolio Allocation Rule**
+
+##### **<실행>**
+
+```{r}
+
+actionButton("go5", "Download & Simulate")   
+
+```
+
+##### **<확인사항>**
+
+- **_사이드바 업데이트시 현재 페이지 활성화되어 있으면 작동 안함!_**
+
+##### **<포트폴리오 배분>**
+
+ 1) 3, 6, 12개월 평균모멘텀 스코어 기준 음(-)의 자산군 제거
+
+ 2) 모멘텀, 변동성, 상관관계 Composite Score 산출하여 상위 n개 자산 선정
+ 
+ 3) 3가지 지표에 대한 가중치 다르게 배분 가능
+
+##### **<데이터 출처 및 관련 자료>** 
+ - **<[Yahoo Finance](https://finance.yahoo.com/)>**
+ 
+ - **<[Flexible Asset Allocation](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2193735)>**
+ 
+ - **<[FAA : Alpha Architect](https://alphaarchitect.com/2013/01/flexible-asset-allocation/)>**
+
+### **Cumulative Performance**
+
+```{r}
+
+renderPlot({
   
+  all <- FAA_strategy_ret()
+
+  charts.PerformanceSummary(all, colorset=c("black", "red", "blue", "green", "darkgrey", "purple", "orange"), main = 'Flexible Asset Allocation')
+
+})
+
+```
+
+## Row {.tabset .tabset-fade}
+
+### **Strategy Performance**
+
+```{r}
+
+renderTable({
+  
+  all <- FAA_strategy_ret()
+  
+  risk_free <- 0.02 / 252
+  stack <- NULL
+  
+  for (m in 1:7) {
+    
+    rtn_cum <- Return.cumulative(all[, m]) # 누적수익률
+    rtn_yr <- Return.annualized(all[, m]) # 연율화 수익률(기하)
+    
+    std_yr <- StdDev.annualized(all[, m]) # 연율화 변동성
+    sr_yr <- SharpeRatio.annualized(all[, m], Rf = risk_free, geometric = TRUE) # 기하평균 기준 연율화 수익률
+    MDD <- maxDrawdown(all[, m]) # 최대 낙폭
+    cr_yr <- CalmarRatio(all[, m])  # 연율화 수익률을 최대낙폭으로 나눈 값
+    
+    agg_temp <- rbind(rtn_cum, rtn_yr, std_yr, sr_yr, MDD, cr_yr)
+    stack <- cbind(stack, agg_temp)
+    
+  }
+  
+  # 티블로 바꿔주고 테이블 정리
+  strategy_perf <- stack %>% 
+    tk_tbl(preserve_index = TRUE,
+           rename_index = "Risk/Return") %>% 
+    as_tibble()
+  
+  strategy_perf[c(1, 2, 3, 5), -1] <- strategy_perf[c(1, 2, 3, 5), -1] * 100
+  strategy_perf <- strategy_perf %>%
+    mutate_if(is.numeric, round, 2)
+  strategy_perf$`Risk/Return`[1] <- "Cumulative Return (%)"
+  strategy_perf$`Risk/Return`[2] <- "Annualized Return (%)"
+  strategy_perf$`Risk/Return`[3] <- "Annualized Standard Deviation (%)"
+  strategy_perf$`Risk/Return`[5] <- "MDD (%)"
+ 
+  strategy_perf
+  
+})
+
+```
+
+### **Strategy Annual Returns (%)**
+
+```{r}
+  
+renderTable({
+ 
+  all <- FAA_strategy_ret()
+  
+  stack2 <- NULL
+  for (n in 1:7) {
+    rtns_yr <- apply.yearly(all[, n], Return.cumulative)
+    stack2 <- cbind(stack2, rtns_yr)
+  }
+  
+  # 티블로 바꿔주고 테이블 정리
+  strategy_rtns_yr <- stack2 %>%
+    tk_tbl(preserve_index = TRUE,
+           rename_index = "Year") %>%
+    as_tibble() 
+  
+  strategy_rtns_yr$Year <- format(strategy_rtns_yr$Year, "%Y")
+  strategy_rtns_yr[, -1] <- strategy_rtns_yr[, -1] * 100
+  
+  strategy_rtns_yr
+ 
+})  
+  
+```  
+
+### **Weights History (%)**
+
+```{r}
+  
+renderTable({
+  
+  momDecor <- FAA_strategy_wt()
+  
+  wts <- momDecor * 100
+  
+  wts_tbl <- wts %>% 
+    tk_tbl(preserve_index = TRUE,
+           rename_index = "Month") %>% 
+    as_tibble()
+  
+  wts_tbl$Month <- format(wts_tbl$Month, "%Y-%m")
+  
+  wts_tbl
+  
+})
+
+```
+
+### **Weights History (Chart)**
+
+```{r}
+  
+renderPlot({
+
+  momDecor <- FAA_strategy_wt()
+  
+  momDecor %>% fortify.zoo() %>%
+    gather(key, value, -Index) %>%
+    mutate(Index = as.Date(Index)) %>%
+    mutate(key = factor(key, levels = unique(key))) %>%
+    ggplot(aes(x = Index, y = value)) +
+    geom_area(aes(color = key, fill = key),
+              position = 'stack') +
+    xlab(NULL) + ylab(NULL) +  theme_bw() +
+    scale_x_date(date_breaks="years", date_labels="%Y",
+                 expand = c(0, 0)) +
+    scale_y_continuous(expand = c(0, 0)) +
+    theme(plot.title = element_text(hjust = 0.5,
+                                    size = 12),
+          legend.position = 'bottom',
+          legend.title = element_blank(),
+          axis.text.x = element_text(angle = 45,
+                                     hjust = 1, size = 8),
+          panel.grid.minor.x = element_blank()) +
+    guides(color = guide_legend(byrow = TRUE))
+
+})  
+  
+```  
+
 # **[Research] Quantitative Research**
 
 ## Row
