@@ -99,7 +99,7 @@ fluidRow(
 
 fluidRow(
   column(3,
-         textInput("ETF7", "ETF 7", "IEF")),
+         textInput("ETF7", "ETF 7", "SCHP")),
   column(3,
          numericInput("w7", "Portf. %", 20, min = 0, max = 100)),
   column(3,
@@ -420,118 +420,128 @@ component_contr <- eventReactive(input$go, {
 
 efficient_frontier <- eventReactive(input$go2, { 
   
-  ETF_returns_tq <- ETF_rtn()
+  # with progress bar         
+  withProgress(message = 'In Progress', value = 0, {
+            
+                        # increment progress bar
+                        incProgress(0.8)
+                        # stop eval to see progress bar long enough :)
+                        Sys.sleep(0.0)
   
-  ETF_rtn_xts <- ETF_returns_tq %>%
-    tk_xts(date_var = Date)
-  
-  # 평균 수익률 계산
-  mean_ret <- colMeans(ETF_rtn_xts)
-  
-  # covariance matrix 계산, annualize
-  if (input$frequency == "daily") {
-    n_ann <- 252
-  } else {
-    n_ann <- 12
-  }
-  
-  cov_mat <- cov(ETF_rtn_xts) * n_ann
-  
-  symbols <- c(input$ETF1, input$ETF2, input$ETF3, input$ETF4, input$ETF5, input$ETF6,
-               input$ETF7, input$ETF8, input$ETF9, input$ETF10, input$ETF11, input$ETF12)
-  
-  # random weights 만들기, uniform distribution 난수
-  wts <- runif(n = length(symbols)) 
-  
-  # 합계가 1이 되도록 만들기
-  wts <- wts / sum(wts)
-  
-  # annualized portfolio returns 계산
-  port_returns <- (sum(wts * mean_ret) + 1) ^ n_ann - 1
-  
-  # annualized standard deviation 계산(연율화된 cov_mat 사용)
-  port_risk <- sqrt(t(wts) %*% (cov_mat %*% wts))
-  
-  # Sharpe Ratio 계산
-  if (input$frequency == "monthly") {
-    risk_free <- input$rf / 100 / 12
+    ETF_returns_tq <- ETF_rtn()
+    
+    ETF_rtn_xts <- ETF_returns_tq %>%
+      tk_xts(date_var = Date)
+    
+    # 평균 수익률 계산
+    mean_ret <- colMeans(ETF_rtn_xts)
+    
+    # covariance matrix 계산, annualize
+    if (input$frequency == "daily") {
+      n_ann <- 252
     } else {
-      risk_free <- input$rf / 100 / 252
-  }
-
-  sharpe_ratio <- (port_returns - risk_free) / port_risk %>% 
-    round(., 2)
-  
-  # sharpe_ratio <- port_returns/port_risk
-  
-  ## n random portfolios
-  num_port <- input$n_simul
-  # num_port <- 500
-  
-  # Creating a matrix to store the weights
-  all_wts <- matrix(nrow = num_port,
-                    ncol = length(symbols))
-  
-  # Creating an empty vector to store
-  # Portfolio returns
-  
-  port_returns <- vector('numeric', length = num_port)
-  
-  # Creating an empty vector to store
-  # Portfolio Standard deviation
-  
-  port_risk <- vector('numeric', length = num_port)
-  
-  # Creating an empty vector to store
-  # Portfolio Sharpe Ratio
-  
-  sharpe_ratio <- vector('numeric', length = num_port)
-  
-  # loop n times
-  for (i in seq_along(port_returns)) {
+      n_ann <- 12
+    }
     
-    # print("")
+    cov_mat <- cov(ETF_rtn_xts) * n_ann
     
-    wts <- runif(length(symbols))
-    wts <- wts/sum(wts)
+    symbols <- c(input$ETF1, input$ETF2, input$ETF3, input$ETF4, input$ETF5, input$ETF6,
+                 input$ETF7, input$ETF8, input$ETF9, input$ETF10, input$ETF11, input$ETF12)
     
-    # Storing weight in the matrix
-    all_wts[i,] <- wts
+    # random weights 만들기, uniform distribution 난수
+    wts <- runif(n = length(symbols)) 
     
+    # 합계가 1이 되도록 만들기
+    wts <- wts / sum(wts)
+    
+    # annualized portfolio returns 계산
+    port_returns <- (sum(wts * mean_ret) + 1) ^ n_ann - 1
+    
+    # annualized standard deviation 계산(연율화된 cov_mat 사용)
+    port_risk <- sqrt(t(wts) %*% (cov_mat %*% wts))
+    
+    # Sharpe Ratio 계산
+    if (input$frequency == "monthly") {
+      risk_free <- input$rf / 100 / 12
+      } else {
+        risk_free <- input$rf / 100 / 252
+    }
+  
+    sharpe_ratio <- (port_returns - risk_free) / port_risk %>% 
+      round(., 2)
+    
+    # sharpe_ratio <- port_returns/port_risk
+    
+    ## n random portfolios
+    num_port <- input$n_simul
+    # num_port <- 500
+    
+    # Creating a matrix to store the weights
+    all_wts <- matrix(nrow = num_port,
+                      ncol = length(symbols))
+    
+    # Creating an empty vector to store
     # Portfolio returns
     
-    port_ret <- sum(wts * mean_ret)
-    port_ret <- ((port_ret + 1) ^ n_ann) - 1
+    port_returns <- vector('numeric', length = num_port)
     
-    # Storing Portfolio Returns values
-    port_returns[i] <- port_ret
+    # Creating an empty vector to store
+    # Portfolio Standard deviation
+    
+    port_risk <- vector('numeric', length = num_port)
+    
+    # Creating an empty vector to store
+    # Portfolio Sharpe Ratio
+    
+    sharpe_ratio <- vector('numeric', length = num_port)
+    
+    # loop n times
+    for (i in seq_along(port_returns)) {
+      
+      # print("")
+      
+      wts <- runif(length(symbols))
+      wts <- wts/sum(wts)
+      
+      # Storing weight in the matrix
+      all_wts[i,] <- wts
+      
+      # Portfolio returns
+      
+      port_ret <- sum(wts * mean_ret)
+      port_ret <- ((port_ret + 1) ^ n_ann) - 1
+      
+      # Storing Portfolio Returns values
+      port_returns[i] <- port_ret
+      
+      
+      # Creating and storing portfolio risk
+      port_sd <- sqrt(t(wts) %*% (cov_mat %*% wts))
+      port_risk[i] <- port_sd
+      
+      # Creating and storing Portfolio Sharpe Ratios
+      # Assuming 0% Risk free rate
+      
+      sr <- port_ret/port_sd
+      sharpe_ratio[i] <- sr
+      
+    }
+    
+    # Storing the values in the table
+    portfolio_values <- tibble(Return = port_returns,
+                               Risk = port_risk,
+                               SharpeRatio = sharpe_ratio)
     
     
-    # Creating and storing portfolio risk
-    port_sd <- sqrt(t(wts) %*% (cov_mat %*% wts))
-    port_risk[i] <- port_sd
+    # Converting matrix to a tibble and changing column names
+    all_wts <- tk_tbl(all_wts)
     
-    # Creating and storing Portfolio Sharpe Ratios
-    # Assuming 0% Risk free rate
+    colnames(all_wts) <- colnames(ETF_rtn_xts)
     
-    sr <- port_ret/port_sd
-    sharpe_ratio[i] <- sr
+    # Combing all the values together
+    portfolio_values <- tk_tbl(cbind(all_wts, portfolio_values))
     
-  }
-  
-  # Storing the values in the table
-  portfolio_values <- tibble(Return = port_returns,
-                             Risk = port_risk,
-                             SharpeRatio = sharpe_ratio)
-  
-  
-  # Converting matrix to a tibble and changing column names
-  all_wts <- tk_tbl(all_wts)
-  
-  colnames(all_wts) <- colnames(ETF_rtn_xts)
-  
-  # Combing all the values together
-  portfolio_values <- tk_tbl(cbind(all_wts, portfolio_values))
+  })
   
 })
 
@@ -920,7 +930,7 @@ FAA_strategy <- eventReactive(input$go5, {
                'EWY' , # 한국 주식
                'EEM' , # 이머징 주식
                'TLT' , # 미국 장기채
-               'IEF' , # 미국 중기채
+               'IEF',  # 미국 중기채
                'AGG' , # 미국 회사채
                'RWX' , # 글로벌 리츠
                'GLD' , # 금
@@ -967,7 +977,7 @@ FAAreturns <- function(prices, monthLookback = 12,
     
       #subset data
       priceData <- prices[monthlyEps[i] : monthlyEps[i + monthLookback],]
-      returnsData <- returns[monthlyEps[i] : (monthlyEps[i+monthLookback] - 1),]
+      returnsData <- returns[monthlyEps[i] : (monthlyEps[i + monthLookback] - 1),]
     
       #perform computations
       momentum_12 <- data.frame(t(t(priceData[nrow(priceData),])/t(priceData[1,]) - 1))
@@ -1040,16 +1050,16 @@ FAA_strategy_ret <- eventReactive(input$go5, {
   
   adPrices <- FAA_strategy()
   
-  FAA_basic <- FAAreturns(adPrices)
-  bestN4 <- FAAreturns(adPrices, bestN=4)
-  N5vol1cor1 <- FAAreturns(adPrices, weightVol = 1, weightCor = 1)
-  minRisk <- FAAreturns(adPrices, weightMom = 0, weightVol=1, weightCor=1)
-  pureMomentum <- FAAreturns(adPrices, weightMom=1, weightVol=0, weightCor=0)
-  maxDecor <- FAAreturns(adPrices, weightMom=0, weightVol=0, weightCor=1)
-  momDecor <- FAAreturns(adPrices, weightMom=1, weightVol=0, weightCor=1)
+  FAA_Opt <- FAAreturns(adPrices, weightMom = 1, weightVol = .5, weightCor = .5, bestN = 6)
+  bestN5 <- FAAreturns(adPrices, bestN = 5)
+  N6vol1cor1 <- FAAreturns(adPrices, weightVol = 1, weightCor = 1, bestN = 6)
+  minRisk <- FAAreturns(adPrices, weightMom = 0, weightVol = 1, weightCor = 1, bestN = 6)
+  pureMomentum <- FAAreturns(adPrices, weightMom = 1, weightVol = 0, weightCor = 0, bestN = 6)
+  maxDecor <- FAAreturns(adPrices, weightMom = 0, weightVol = 0, weightCor = 1, bestN = 6)
+  momDecor <- FAAreturns(adPrices, weightMom = 1, weightVol = 0, weightCor = 1, bestN = 6)
 
-  all <- cbind(FAA_basic, bestN4, N5vol1cor1, minRisk, pureMomentum, maxDecor, momDecor)
-  colnames(all) <- c("FAA_basic", "N4", "vol_1_cor_1", "minRisk", "pureMomentum", "maxDecor", "momDecor")
+  all <- cbind(FAA_Opt, bestN5, N6vol1cor1, minRisk, pureMomentum, maxDecor, momDecor)
+  colnames(all) <- c("FAA_Opt", "N5", "vol_1_cor_1", "minRisk", "pureMomentum", "maxDecor", "momDecor")
   
   return(all)
   
@@ -1150,7 +1160,7 @@ FAA_strategy_wt <- eventReactive(input$go5, {
   
   adPrices <- FAA_strategy()
   
-  momDecor <- FAAweights(adPrices, weightMom=1, weightVol=0, weightCor=1)
+  weight <- FAAweights(adPrices, weightMom = 1, weightVol = .5, weightCor = .5, bestN = 6)
 
 })  
     
@@ -2373,15 +2383,15 @@ renderTable({
   
 ```  
 
-### **Weights History (%)**
+### **FAA_Opt Weights History (%)**
 
 ```{r}
   
 renderTable({
   
-  momDecor <- FAA_strategy_wt()
+  weight <- FAA_strategy_wt()
   
-  wts <- momDecor * 100
+  wts <- weight * 100
   
   wts_tbl <- wts %>% 
     tk_tbl(preserve_index = TRUE,
@@ -2396,15 +2406,15 @@ renderTable({
 
 ```
 
-### **Weights History (Chart)**
+### **FAA_Opt Weights History (Chart)**
 
 ```{r}
   
 renderPlot({
 
-  momDecor <- FAA_strategy_wt()
+  weight <- FAA_strategy_wt()
   
-  momDecor %>% fortify.zoo() %>%
+  weight %>% fortify.zoo() %>%
     gather(key, value, -Index) %>%
     mutate(Index = as.Date(Index)) %>%
     mutate(key = factor(key, levels = unique(key))) %>%
