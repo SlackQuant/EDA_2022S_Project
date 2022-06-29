@@ -939,7 +939,7 @@ FAA_strategy <- eventReactive(input$go5, {
   )
   
   # data
-  getSymbols(symbols, src = 'yahoo')
+  getSymbols(symbols, src = 'yahoo')  #, from = "2008-01-01", to = "2021-12-31")
   tmp <- list()
   for(fund in symbols) {
     tmp[[fund]] <- Ad(get(fund))
@@ -1051,15 +1051,15 @@ FAA_strategy_ret <- eventReactive(input$go5, {
   adPrices <- FAA_strategy()
   
   FAA_Opt <- FAAreturns(adPrices, weightMom = 1, weightVol = .5, weightCor = .5, bestN = 6)
-  bestN5 <- FAAreturns(adPrices, bestN = 5)
+  bestN3 <- FAAreturns(adPrices, bestN = 3)
   N6vol1cor1 <- FAAreturns(adPrices, weightVol = 1, weightCor = 1, bestN = 6)
   minRisk <- FAAreturns(adPrices, weightMom = 0, weightVol = 1, weightCor = 1, bestN = 6)
   pureMomentum <- FAAreturns(adPrices, weightMom = 1, weightVol = 0, weightCor = 0, bestN = 6)
   maxDecor <- FAAreturns(adPrices, weightMom = 0, weightVol = 0, weightCor = 1, bestN = 6)
   momDecor <- FAAreturns(adPrices, weightMom = 1, weightVol = 0, weightCor = 1, bestN = 6)
 
-  all <- cbind(FAA_Opt, bestN5, N6vol1cor1, minRisk, pureMomentum, maxDecor, momDecor)
-  colnames(all) <- c("FAA_Opt", "N5", "vol_1_cor_1", "minRisk", "pureMomentum", "maxDecor", "momDecor")
+  all <- cbind(FAA_Opt, bestN3, N6vol1cor1, minRisk, pureMomentum, maxDecor, momDecor)
+  colnames(all) <- c("FAA_Opt", "N3", "vol_1_cor_1", "minRisk", "pureMomentum", "maxDecor", "momDecor")
   
   return(all)
   
