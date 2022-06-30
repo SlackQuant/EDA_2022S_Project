@@ -1052,7 +1052,7 @@ FAA_strategy_ret <- eventReactive(input$go5, {
   
   FAA_Opt <- FAAreturns(adPrices, weightMom = 1, weightVol = .5, weightCor = .5, bestN = 6)
   bestN3 <- FAAreturns(adPrices, bestN = 3)
-  N6vol1cor1 <- FAAreturns(adPrices, weightVol = 1, weightCor = 1, bestN = 6)
+  N6vol1cor1 <- FAAreturns(adPrices, weightMom = 1, weightVol = 1, weightCor = 1, bestN = 6)
   minRisk <- FAAreturns(adPrices, weightMom = 0, weightVol = 1, weightCor = 1, bestN = 6)
   pureMomentum <- FAAreturns(adPrices, weightMom = 1, weightVol = 0, weightCor = 0, bestN = 6)
   maxDecor <- FAAreturns(adPrices, weightMom = 0, weightVol = 0, weightCor = 1, bestN = 6)
