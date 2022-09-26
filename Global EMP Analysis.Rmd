@@ -1014,12 +1014,12 @@ FAAreturns <- function(prices, monthLookback = 12,
         longs[longs > 1/bestN] <- 1/bestN #in the event that we have fewer than top N invested into, lower weights to 1/top N
         names(longs) <- rownames(ranks)
     
-      } else if(nrow(stats) == 1) { #only one security had positive momentum
-        longs <- 1/bestN
-        names(longs) <- rownames(stats)
-      } else { #no securities had positive momentum
+      } else if(nrow(stats) == 1 & rownames(stats) == "1") { #no securities had positive momentum
         longs <- 1
         names(longs) <- riskFreeName
+      } else { #only one security had positive momentum 
+        longs <- 1 / bestN
+        names(longs) <- rownames(stats)
       }
     
       #append removed names (those with momentum < 0)
@@ -1103,7 +1103,7 @@ FAAweights <- function(prices, monthLookback = 12,
       
       vol <- as.numeric(-sd.annualized(returnsData[(nrow(returnsData) / 2) : nrow(returnsData)]))
       # sumCors <- -colSums(cor(priceData[endpoints(priceData, on="months")]))
-      sumCors <- -colSums(cor(returnsData[(nrow(returnsData) / 2) : nrow(returnsData)], use="complete.obs"))
+      sumCors <- -colSums(cor(returnsData[(nrow(returnsData) / 2) : nrow(returnsData)], use = "complete.obs"))
       stats <- data.frame(cbind(momentum, vol, sumCors))
     
       if(nrow(stats) > 1) {
@@ -1124,12 +1124,12 @@ FAAweights <- function(prices, monthLookback = 12,
         longs[longs > 1/bestN] <- 1/bestN #in the event that we have fewer than top N invested into, lower weights to 1/top N
         names(longs) <- rownames(ranks)
     
-      } else if(nrow(stats) == 1) { #only one security had positive momentum
-        longs <- 1/bestN
-        names(longs) <- rownames(stats)
-      } else { #no securities had positive momentum
+      } else if(nrow(stats) == 1 & rownames(stats) == "1") { #no securities had positive momentum
         longs <- 1
         names(longs) <- riskFreeName
+      } else { #only one security had positive momentum 
+        longs <- 1 / bestN
+        names(longs) <- rownames(stats)
       }
     
       #append removed names (those with momentum < 0)
