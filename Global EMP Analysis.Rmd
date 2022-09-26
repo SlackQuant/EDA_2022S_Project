@@ -993,7 +993,7 @@ FAAreturns <- function(prices, monthLookback = 12,
       
       vol <- as.numeric(-sd.annualized(returnsData[(nrow(returnsData) / 2) : nrow(returnsData)]))
       # sumCors <- -colSums(cor(priceData[endpoints(priceData, on="months")]))
-      sumCors <- -colSums(cor(returnsData[(nrow(returnsData) / 2) : nrow(returnsData)], use="complete.obs"))
+      sumCors <- -colSums(cor(returnsData[(nrow(returnsData) / 2) : nrow(returnsData)], use = "na.or.complete"))
       stats <- data.frame(cbind(momentum, vol, sumCors))
     
       if(nrow(stats) > 1) {
@@ -1103,7 +1103,7 @@ FAAweights <- function(prices, monthLookback = 12,
       
       vol <- as.numeric(-sd.annualized(returnsData[(nrow(returnsData) / 2) : nrow(returnsData)]))
       # sumCors <- -colSums(cor(priceData[endpoints(priceData, on="months")]))
-      sumCors <- -colSums(cor(returnsData[(nrow(returnsData) / 2) : nrow(returnsData)], use = "complete.obs"))
+      sumCors <- -colSums(cor(returnsData[(nrow(returnsData) / 2) : nrow(returnsData)], use = "na.or.complete"))
       stats <- data.frame(cbind(momentum, vol, sumCors))
     
       if(nrow(stats) > 1) {
